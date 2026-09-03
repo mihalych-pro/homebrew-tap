@@ -73,10 +73,11 @@ none — it has no `completion` subcommand upstream.
   `deckhouse-module-tool` installs `dmt`, `flant-flint` installs `flint`. The
   former short names still resolve, so `brew install mihalych-pro/tap/d8` keeps
   working.
-- **`flant-flint` carries the prefix on purpose** — `homebrew/core` already has
-  an unrelated `flint`, a number-theory library.
+
 - **`d8` has no linux-arm64 build.** Upstream publishes none, so that formula
   installs on macOS (Intel and Apple silicon) and Linux x86_64 only.
+
+<!-- - **`flant-flint` carries the prefix on purpose** — `homebrew/core` already has an unrelated `flint`, a number-theory library. -->
 
 ## More
 

@@ -42,21 +42,12 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@3cdb78d0f62ad29dd32de765782654f4eedea607 # 2026.08.31.1
 
-      - name: Expose the checkout as the tap
-        # brew livecheck / style / audit resolve packages by tap name, so the
-        # working copy has to be visible to Homebrew as mihalych-pro/tap. A
-        # symlink is what keeps it a single tree: Homebrew keeps `Tap#path` as
-        # the symlink itself, so it reads and writes straight through into the
-        # checkout, and the git work below sees those edits. Copying or
-        # `brew tap <user/repo> <path>` would clone instead, leaving brew
-        # editing files that never reach the commit.
+      - name: Verify the tap is visible
+        # setup-homebrew already symlinks $GITHUB_WORKSPACE into Library/Taps
+        # and runs `brew trust` on it (see its main.sh), so neither is repeated
+        # here. This only turns a layout surprise into a readable failure
+        # instead of a confusing "no such formula" further down.
         run: |
-          taps="$(brew --repository)/Library/Taps/mihalych-pro"
-          mkdir -p "$taps"
-          ln -sfn "$GITHUB_WORKSPACE" "$taps/homebrew-tap"
-
-          # Fail here with something readable rather than further down with a
-          # confusing "no such formula", if the layout ever differs.
           brew ruby -e '
             tap = Tap.fetch("mihalych-pro/tap")
             unless tap.installed? && tap.formula_files.any?
@@ -68,14 +59,15 @@ jobs:
       - name: Install Task
         run: command -v task >/dev/null || brew install go-task
 
-      - name: Trust the tap
-        # The bump script builds Formula and Cask objects in-process, which
-        # evaluates this tap's Ruby, so Homebrew wants the tap vouched for. On
-        # an ephemeral runner that is just the repository checked out above.
-        run: brew trust --tap mihalych-pro/tap
+      - name: Install the gem groups the scripts need
+        # `utils/ast` requires rubocop-ast, which lives in the optional `ast`
+        # bundle group. Homebrew installs it for `bump-formula-pr`; nothing
+        # installs it for us, so the bump script dies with
+        # "cannot load such file -- rubocop-ast" on a fresh runner.
+        # `style` covers `task audit`, `livecheck` the version checks.
+        run: brew install-bundler-gems --add-groups=ast,style,livecheck
 
       - name: Report what is outdated
-        # Also warms up the livecheck gem group through Homebrew's own command.
         run: task check
 
       - name: Collect the packages to bump
@@ -83,6 +75,10 @@ jobs:
         env:
           REQUESTED: ${{ inputs.packages }}
         run: |
+          # Without pipefail a crash in the script yields an empty list, and the
+          # run reports "Nothing to bump" and goes green. That has happened.
+          set -o pipefail
+
           if [ -n "$REQUESTED" ]; then
             names="$REQUESTED"
           else
