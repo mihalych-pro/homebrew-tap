@@ -1,0 +1,73 @@
+version: "3"
+
+vars:
+  TAP: mihalych-pro/tap
+  # Packages this tap actually owns; `test` installs them, everything else
+  # works across the whole tap.
+  MAINTAINED: deckhouse-cli deckhouse-module-tool flant-flint werf
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_FROM_API: "1"
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  update:
+    desc: Bump every formula and cask in the tap to its latest release
+    summary: |
+      Runs entirely inside Homebrew's own Ruby, no subprocesses: Tap for
+      discovery, Livecheck for versions, Resource for downloads, Utils::AST for
+      parsing, and Homebrew's BumpCaskPr / BumpFormulaPr command classes called
+      directly. Only the per-platform formulas are rewritten by hand.
+
+      Needs the tap trusted once, since building the package objects evaluates
+      its Ruby:
+        brew trust --tap mihalych-pro/tap
+
+      Pass names to limit the run, or extra flags after --:
+        task update -- werf wesnoth
+        task update -- --dry-run
+        task update -- werf --set 2.76.0
+
+      Recomputing per-platform checksums re-downloads the artifacts; a full
+      werf bump moves roughly 450 MB.
+    cmds:
+      # The `--` keeps `brew ruby` from claiming the script's own flags.
+      - brew ruby scripts/update-formulas.rb -- {{.CLI_ARGS}}
+
+  check:
+    desc: Report which packages are outdated, without changing anything
+    summary: |
+      Wraps `brew livecheck`, which prints "current ==> latest" but never says
+      whether that difference means anything -- and two versions can read as
+      different while comparing equal (2.01.3 is the same version as 2.1.3 to
+      Homebrew). The status word comes from the `outdated` flag in its JSON.
+    cmds:
+      - brew livecheck --tap={{.TAP}} --json | brew ruby scripts/report-versions.rb
+
+  audit:
+    desc: Style and audit the tap (pass names to limit, e.g. task audit -- werf)
+    vars:
+      REFS: '{{range $n := splitList " " .CLI_ARGS}}{{if $n}}{{$.TAP}}/{{$n}} {{end}}{{end}}'
+    cmds:
+      - brew style {{if .CLI_ARGS}}{{.REFS}}{{else}}{{.TAP}}{{end}}
+      - brew audit --strict {{if .CLI_ARGS}}{{.REFS}}{{else}}--tap={{.TAP}}{{end}}
+
+  fix:
+    desc: Auto-correct the style offences that RuboCop can fix itself
+    cmds:
+      - brew style --fix {{.TAP}}
+
+  test:
+    desc: Install and run the test block of each maintained formula
+    summary: |
+      Installs the formulas into the local Homebrew prefix, so they shadow any
+      trdl-installed d8, dmt, flint or werf on your PATH.
+    cmds:
+      - for: { var: MAINTAINED, split: " ", as: FORMULA }
+        cmd: brew reinstall {{.TAP}}/{{.FORMULA}} && brew test {{.TAP}}/{{.FORMULA}}

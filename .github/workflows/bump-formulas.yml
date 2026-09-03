@@ -1,0 +1,168 @@
+name: Bump formulas
+
+# Every six hours, open one pull request per outdated package. The companion
+# workflow (merge-automated-prs.yml) merges them once they are a day old.
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Space-separated names to bump; empty means everything outdated"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Never let two bump runs race for the same branches.
+concurrency:
+  group: bump-formulas
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    # ubuntu rather than macos: the rewriter walks the AST and refreshes every
+    # platform's url/sha256 regardless of the host, so nothing here needs macOS
+    # — and Linux runners bill without the 10x macOS multiplier. Note that a
+    # Linux *arm* runner would not work: deckhouse-cli publishes no
+    # linux-arm64 asset, so the formula has no url to load on that platform.
+    runs-on: ubuntu-latest
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_FROM_API: "1"
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Each package is branched off origin/main, so the history is needed.
+          fetch-depth: 0
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@a657b8b0cd35d0f65cce41fce9b24cf054b49869 # 2026.08.24.1
+
+      - name: Expose the checkout as the tap
+        # brew livecheck / style / audit resolve packages by tap name, so the
+        # working copy has to be visible to Homebrew as mihalych-pro/tap. A
+        # symlink is what keeps it a single tree: Homebrew keeps `Tap#path` as
+        # the symlink itself, so it reads and writes straight through into the
+        # checkout, and the git work below sees those edits. Copying or
+        # `brew tap <user/repo> <path>` would clone instead, leaving brew
+        # editing files that never reach the commit.
+        run: |
+          taps="$(brew --repository)/Library/Taps/mihalych-pro"
+          mkdir -p "$taps"
+          ln -sfn "$GITHUB_WORKSPACE" "$taps/homebrew-tap"
+
+          # Fail here with something readable rather than further down with a
+          # confusing "no such formula", if the layout ever differs.
+          brew ruby -e '
+            tap = Tap.fetch("mihalych-pro/tap")
+            unless tap.installed? && tap.formula_files.any?
+              abort "tap is not visible to Homebrew at #{tap.path}"
+            end
+            puts "tap ready: #{tap.formula_files.count} formulae, #{tap.cask_files.count} casks"
+          '
+
+      - name: Install Task
+        run: command -v task >/dev/null || brew install go-task
+
+      - name: Trust the tap
+        # The bump script builds Formula and Cask objects in-process, which
+        # evaluates this tap's Ruby, so Homebrew wants the tap vouched for. On
+        # an ephemeral runner that is just the repository checked out above.
+        run: brew trust --tap mihalych-pro/tap
+
+      - name: Report what is outdated
+        # Also warms up the livecheck gem group through Homebrew's own command.
+        run: task check
+
+      - name: Collect the packages to bump
+        id: collect
+        env:
+          REQUESTED: ${{ inputs.packages }}
+        run: |
+          if [ -n "$REQUESTED" ]; then
+            names="$REQUESTED"
+          else
+            names="$(brew ruby scripts/update-formulas.rb -- --outdated | paste -sd' ' -)"
+          fi
+          if [ -z "$names" ]; then
+            echo "Nothing to bump."
+          else
+            echo "Outdated: $names"
+          fi
+          echo "names=$names" >>"$GITHUB_OUTPUT"
+
+      - name: Open one pull request per package
+        if: steps.collect.outputs.names != ''
+        env:
+          NAMES: ${{ steps.collect.outputs.names }}
+        run: |
+          set -o pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # The label is how the merge workflow recognises its own PRs, so it
+          # has to exist before the first one is opened.
+          gh label create automated-bump --force \
+            --color ededed --description "Opened by the bump-formulas workflow"
+
+          failed=""
+          for name in $NAMES; do
+            echo "::group::$name"
+
+            # Start from a pristine main: a previous package may have failed
+            # halfway and left edits behind.
+            git reset --hard origin/main
+            git switch -C "automated/bump-$name"
+
+            if ! task update -- "$name" 2>&1 | tee bump.log; then
+              echo "::error title=$name::bump failed"
+              failed="$failed $name"
+              echo "::endgroup::"
+              continue
+            fi
+
+            if git diff --quiet -- Formula Casks; then
+              echo "already up to date, nothing to commit"
+              echo "::endgroup::"
+              continue
+            fi
+
+            if ! task audit -- "$name"; then
+              echo "::error title=$name::audit failed, not opening a pull request"
+              failed="$failed $name"
+              echo "::endgroup::"
+              continue
+            fi
+
+            # The script prints "<name> (<kind>): <old> -> <new>".
+            version="$(sed -nE "s/^${name} \(.*\): .* -> (.*)$/\1/p" bump.log | tail -1)"
+            rm -f bump.log
+
+            git commit --quiet -am "$name $version"
+            git push --quiet --force-with-lease origin "automated/bump-$name"
+
+            # Reuse the open pull request for this branch if there is one, so a
+            # second bump before the merge window just updates it.
+            if [ -z "$(gh pr list --head "automated/bump-$name" --state open --json number --jq '.[].number')" ]; then
+              gh pr create --base main --head "automated/bump-$name" \
+                --label automated-bump \
+                --title "$name $version" \
+                --body "Bumped by \`task update\`. \`task audit\` passed on Linux."
+            else
+              echo "updated the existing pull request"
+            fi
+
+            echo "::endgroup::"
+          done
+
+          git reset --hard origin/main
+
+          if [ -n "$failed" ]; then
+            echo "Failed:$failed"
+            exit 1
+          fi

@@ -1,0 +1,79 @@
+name: Merge automated bumps
+
+# Every six hours, at 33 minutes past, squash-merge the bump pull requests that
+# have been open for more than a day. Offset from bump-formulas.yml on purpose,
+# so a merge never lands while a bump run is pushing branches.
+#
+# Only pull requests carrying the `automated-bump` label are considered, which
+# is what bump-formulas.yml attaches. Anything opened by hand is left alone.
+
+on:
+  schedule:
+    - cron: "33 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      max_age_hours:
+        description: "Merge pull requests older than this many hours"
+        required: false
+        default: "24"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: merge-automated-prs
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      MAX_AGE_HOURS: ${{ inputs.max_age_hours || '24' }}
+    steps:
+      - name: Merge pull requests older than the cutoff
+        run: |
+          set -o pipefail
+
+          cutoff="$(date -u -d "$MAX_AGE_HOURS hours ago" +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Merging automated bumps opened before $cutoff"
+
+          # mergeable is UNKNOWN until GitHub has computed it, so ask for the
+          # list once, then re-read each candidate individually below.
+          candidates="$(
+            gh pr list --label automated-bump --state open \
+              --json number,createdAt \
+              --jq "[.[] | select(.createdAt < \"$cutoff\") | .number] | .[]"
+          )"
+
+          if [ -z "$candidates" ]; then
+            echo "No automated pull request is old enough."
+            exit 0
+          fi
+
+          skipped=""
+          for number in $candidates; do
+            read -r mergeable state title <<<"$(
+              gh pr view "$number" --json mergeable,mergeStateStatus,title \
+                --jq '"\(.mergeable) \(.mergeStateStatus) \(.title)"'
+            )"
+
+            if [ "$mergeable" != "MERGEABLE" ]; then
+              echo "::warning title=#$number::not merged, mergeable=$mergeable state=$state ($title)"
+              skipped="$skipped #$number"
+              continue
+            fi
+
+            echo "Merging #$number: $title"
+            if ! gh pr merge "$number" --squash --delete-branch; then
+              echo "::warning title=#$number::merge was refused ($title)"
+              skipped="$skipped #$number"
+            fi
+          done
+
+          # A pull request that is merely blocked or conflicted is reported and
+          # left for the next run rather than failing the workflow.
+          [ -n "$skipped" ] && echo "Left open:$skipped"
+          exit 0
