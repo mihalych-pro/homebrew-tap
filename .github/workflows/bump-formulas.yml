@@ -33,14 +33,23 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_FROM_API: "1"
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # So `gh` never has to infer the repository from a remote url that now
+      # carries a token.
+      GH_REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          # Each package is branched off origin/main, so the history is needed.
-          fetch-depth: 0
-
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@3cdb78d0f62ad29dd32de765782654f4eedea607 # 2026.08.31.1
+
+      - name: Give git a token to push with
+        # setup-homebrew builds the working copy itself — `git init` plus
+        # `git remote add origin https://github.com/<repo>` — after deleting
+        # whatever actions/checkout left behind. That remote carries no
+        # credentials, so a push fails with "could not read Username". This is
+        # also why there is no checkout step above: its work would be thrown
+        # away.
+        run: |
+          git remote set-url origin \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
       - name: Verify the tap is visible
         # setup-homebrew already symlinks $GITHUB_WORKSPACE into Library/Taps
