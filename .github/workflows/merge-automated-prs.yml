@@ -20,6 +20,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # To re-dispatch bump-formulas.yml when a merge leaves another PR conflicted.
+  actions: write
 
 concurrency:
   group: merge-automated-prs
@@ -54,6 +56,7 @@ jobs:
           fi
 
           skipped=""
+          merged=""
           for number in $candidates; do
             read -r mergeable state title <<<"$(
               gh pr view "$number" --json mergeable,mergeStateStatus,title \
@@ -67,7 +70,9 @@ jobs:
             fi
 
             echo "Merging #$number: $title"
-            if ! gh pr merge "$number" --squash --delete-branch; then
+            if gh pr merge "$number" --squash --delete-branch; then
+              merged="$merged #$number"
+            else
               echo "::warning title=#$number::merge was refused ($title)"
               skipped="$skipped #$number"
             fi
@@ -75,5 +80,18 @@ jobs:
 
           # A pull request that is merely blocked or conflicted is reported and
           # left for the next run rather than failing the workflow.
-          [ -n "$skipped" ] && echo "Left open:$skipped"
+          #
+          # The usual cause is expected: FORMULAE.md / CASKS.md are tables, and
+          # git cannot auto-merge changes to adjacent rows, so merging one bump
+          # conflicts every other open bump on those files. Re-dispatching the
+          # bump workflow rebuilds each branch from the new main and
+          # force-pushes, which clears it long before the next merge window.
+          if [ -n "$skipped" ]; then
+            echo "Left open:$skipped"
+            if [ -n "$merged" ]; then
+              echo "Re-dispatching bump-formulas.yml to rebase what is left."
+              gh workflow run bump-formulas.yml || \
+                echo "::warning::could not re-dispatch bump-formulas.yml"
+            fi
+          fi
           exit 0

@@ -50,6 +50,18 @@ tasks:
     cmds:
       - brew livecheck --tap={{.TAP}} --json | brew ruby scripts/report-versions.rb
 
+  docs:
+    desc: Regenerate FORMULAE.md and CASKS.md from the packages
+    summary: |
+      Name, description and version are read out of the package objects, so the
+      tables cannot drift from the .rb files. The "Updated" column keeps the day
+      a version was first recorded here.
+
+      Pass -- --check to fail instead of writing, e.g. in CI:
+        task docs -- --check
+    cmds:
+      - brew ruby scripts/generate-docs.rb -- {{.CLI_ARGS}}
+
   audit:
     desc: Style and audit the tap (pass names to limit, e.g. task audit -- werf)
     vars:

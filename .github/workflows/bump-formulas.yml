@@ -119,7 +119,8 @@ jobs:
             git reset --hard origin/main
             git switch -C "automated/bump-$name"
 
-            if ! task update -- "$name" 2>&1 | tee bump.log; then
+            log="$RUNNER_TEMP/bump-$name.log"
+            if ! task update -- "$name" 2>&1 | tee "$log"; then
               echo "::error title=$name::bump failed"
               failed="$failed $name"
               echo "::endgroup::"
@@ -132,6 +133,9 @@ jobs:
               continue
             fi
 
+            # The listings quote the version, so they belong in this commit.
+            task docs
+
             if ! task audit -- "$name"; then
               echo "::error title=$name::audit failed, not opening a pull request"
               failed="$failed $name"
@@ -140,10 +144,12 @@ jobs:
             fi
 
             # The script prints "<name> (<kind>): <old> -> <new>".
-            version="$(sed -nE "s/^${name} \(.*\): .* -> (.*)$/\1/p" bump.log | tail -1)"
-            rm -f bump.log
+            version="$(sed -nE "s/^${name} \(.*\): .* -> (.*)$/\1/p" "$log" | tail -1)"
 
-            git commit --quiet -am "$name $version"
+            # Explicit paths rather than `-a`: the listings may still be
+            # untracked on the very first run, and nothing else should slip in.
+            git add -- Formula Casks FORMULAE.md CASKS.md
+            git commit --quiet -m "$name $version"
             git push --quiet --force-with-lease origin "automated/bump-$name"
 
             # Reuse the open pull request for this branch if there is one, so a
