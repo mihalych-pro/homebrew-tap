@@ -149,8 +149,10 @@ jobs:
             fi
 
             # The script already prints exactly the line we want as a title:
-            # "<name> (<kind>): <old> -> <new>".
-            title="$(sed -nE "/^${name} \(.+\): .+ -> .+\$/p" "$log" | tail -1)"
+            # "<name> (<kind>): <old> -> <new>". Task colours its output, so the
+            # line arrives prefixed with an escape sequence and an anchored
+            # match would silently find nothing — strip the codes first.
+            title="$(sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$log" | sed -nE "/^${name} \(.+\): .+ -> .+\$/p" | tail -1)"
             version="${title##* -> }"
             if [ -z "$title" ]; then
               echo "::error title=$name::could not read the versions out of the bump output"
