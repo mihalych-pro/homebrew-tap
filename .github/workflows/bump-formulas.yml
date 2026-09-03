@@ -148,8 +148,16 @@ jobs:
               continue
             fi
 
-            # The script prints "<name> (<kind>): <old> -> <new>".
-            version="$(sed -nE "s/^${name} \(.*\): .* -> (.*)$/\1/p" "$log" | tail -1)"
+            # The script already prints exactly the line we want as a title:
+            # "<name> (<kind>): <old> -> <new>".
+            title="$(sed -nE "/^${name} \(.+\): .+ -> .+\$/p" "$log" | tail -1)"
+            version="${title##* -> }"
+            if [ -z "$title" ]; then
+              echo "::error title=$name::could not read the versions out of the bump output"
+              failed="$failed $name"
+              echo "::endgroup::"
+              continue
+            fi
 
             # Explicit paths rather than `-a`: the listings may still be
             # untracked on the very first run, and nothing else should slip in.
@@ -157,15 +165,19 @@ jobs:
             git commit --quiet -m "$name $version"
             git push --quiet --force-with-lease origin "automated/bump-$name"
 
-            # Reuse the open pull request for this branch if there is one, so a
-            # second bump before the merge window just updates it.
-            if [ -z "$(gh pr list --head "automated/bump-$name" --state open --json number --jq '.[].number')" ]; then
+            # Reuse the open pull request for this branch if there is one. Its
+            # title has to be refreshed too: a second bump before the merge
+            # window moves the target version, and a stale title would name a
+            # version the branch no longer carries.
+            number="$(gh pr list --head "automated/bump-$name" --state open --json number --jq '.[0].number // empty')"
+            if [ -z "$number" ]; then
               gh pr create --base main --head "automated/bump-$name" \
                 --label automated-bump \
-                --title "$name $version" \
+                --title "$title" \
                 --body "Bumped by \`task update\`. \`task audit\` passed on Linux."
             else
-              echo "updated the existing pull request"
+              gh pr edit "$number" --title "$title"
+              echo "updated pull request #$number"
             fi
 
             echo "::endgroup::"
