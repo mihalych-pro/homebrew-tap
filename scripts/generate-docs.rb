@@ -66,7 +66,7 @@ module DocsGenerator
   # though the url for that OS loads perfectly well.
   def available?(kind, path, os, arch)
     Homebrew::SimulateSystem.with(os:, arch:) do
-      Homebrew.with_no_api_env do
+      Homebrew::API.with_no_api_env do
         if kind == :cask
           cask = Cask::CaskLoader.load(path)
           next false if cask.url.blank?
@@ -112,7 +112,7 @@ module DocsGenerator
     files = (kind == :cask) ? tap.cask_files : tap.formula_files
     files -= ignored(files)
 
-    Homebrew.with_no_api_env do
+    Homebrew::API.with_no_api_env do
       files.filter_map do |path|
         package = (kind == :cask) ? Cask::CaskLoader.load(path) : Formulary.factory(path)
         Entry.new(

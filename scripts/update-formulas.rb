@@ -99,7 +99,7 @@ module TapUpdater
     tap = Tap.fetch(TAP_NAME)
     untrusted = []
 
-    packages = Homebrew.with_no_api_env do
+    packages = Homebrew::API.with_no_api_env do
       loaders = tap.formula_files.to_h { |path| [path, -> { Formulary.factory(path) }] }
                    .merge(tap.cask_files.to_h { |path| [path, -> { Cask::CaskLoader.load(path) }] })
       loaders.filter_map do |path, load|
