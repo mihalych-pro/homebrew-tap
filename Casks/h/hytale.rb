@@ -7,9 +7,10 @@ cask "hytale" do
   # substitution the way the formulas are, and scripts/update-formulas.rb hands
   # it to bump-cask-pr, which re-evaluates it per system to learn the new urls.
   on_macos do
-    sha256 "b641f5d1b480f7be2639715d5199d53fc7742af9885df558a15406d94d79f5c4"
-
-    url "https://launcher.hytale.com/builds/release/darwin/arm64/hytale-launcher-#{version}.dmg"
+    on_arm do
+      sha256 "b641f5d1b480f7be2639715d5199d53fc7742af9885df558a15406d94d79f5c4"
+      url "https://launcher.hytale.com/builds/release/darwin/arm64/hytale-launcher-#{version}.dmg"
+    end
 
     depends_on arch: :arm64
 
@@ -22,10 +23,11 @@ cask "hytale" do
     ]
   end
   on_linux do
-    sha256 "211df76d9dc94fe2e7188a2b0cef7b0b8e75dc540d6eb283e4338240141cf1e8"
-
-    # The Linux archive holds a single bare executable, not an app bundle.
-    url "https://launcher.hytale.com/builds/release/linux/amd64/hytale-launcher-#{version}.zip"
+    on_intel do
+      sha256 "211df76d9dc94fe2e7188a2b0cef7b0b8e75dc540d6eb283e4338240141cf1e8"
+      # The Linux archive holds a single bare executable, not an app bundle.
+      url "https://launcher.hytale.com/builds/release/linux/amd64/hytale-launcher-#{version}.zip"
+    end
 
     depends_on arch: :x86_64
 
