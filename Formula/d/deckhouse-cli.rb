@@ -12,19 +12,19 @@ class DeckhouseCli < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.15/d8-v0.33.15-darwin-amd64.tar.gz"
-      sha256 "f5d25f9beaece7acbfe7d8b2b817104734b5d106692db1b411e3a5a14c8d4bf2"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.16/d8-v0.33.16-darwin-amd64.tar.gz"
+      sha256 "66feb2bc327aaa47000db734d4f90f4e0822c3ad7bf427b0b1803aa190dec9e9"
     end
     on_arm do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.15/d8-v0.33.15-darwin-arm64.tar.gz"
-      sha256 "83ed9b2d272d1faf27239e255097bd2a599c41fc7ee47207607759505b4c01fc"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.16/d8-v0.33.16-darwin-arm64.tar.gz"
+      sha256 "3c1dc33acbb5c128dc2453ecfc15f6daa86d4c67bf2272ed185eb6235b5f6008"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.15/d8-v0.33.15-linux-amd64.tar.gz"
-      sha256 "8bc4289f5496f0072baea760fe53eb5d3bc340479d923597369532877bc4c49c"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.16/d8-v0.33.16-linux-amd64.tar.gz"
+      sha256 "4f361bfe85a194d86b1f20a4e644cdddc0be36f4ccf013bd0dccfc9aefe0f2bb"
     end
   end
 
