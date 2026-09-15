@@ -4,6 +4,6 @@
 
 | Formula | Description | Platforms | Version | Updated |
 | --- | --- | --- | --- | --- |
-| [deckhouse-cli](Formula/d/deckhouse-cli.rb) | Command-line client for the Deckhouse Kubernetes Platform | macOS (arm64, x86_64), Linux (x86_64) | 0.33.16 | 2026-09-12 |
+| [deckhouse-cli](Formula/d/deckhouse-cli.rb) | Command-line client for the Deckhouse Kubernetes Platform | macOS (arm64, x86_64), Linux (x86_64) | 0.33.17 | 2026-09-15 |
 | [deckhouse-module-tool](Formula/d/deckhouse-module-tool.rb) | Linter, renderer and test runner for Deckhouse modules | macOS (arm64, x86_64), Linux (arm64, x86_64) | 0.2.4 | 2026-09-05 |
 | [werf](Formula/w/werf.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 2.76.0 | 2026-09-10 |
