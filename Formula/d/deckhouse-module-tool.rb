@@ -12,23 +12,23 @@ class DeckhouseModuleTool < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/deckhouse/dmt/releases/download/v0.2.4/dmt-0.2.4-darwin-amd64.tar.gz"
-      sha256 "8c96c6fbb201be08be351c8a4f1e18aa60c8b720edc824b6029de19d245cfce2"
+      url "https://github.com/deckhouse/dmt/releases/download/v0.2.5/dmt-0.2.5-darwin-amd64.tar.gz"
+      sha256 "5cdd1e07db6b5e8ff05787cbbc2b316c712e7065c0bb66acc59820708a8933be"
     end
     on_arm do
-      url "https://github.com/deckhouse/dmt/releases/download/v0.2.4/dmt-0.2.4-darwin-arm64.tar.gz"
-      sha256 "953a2bc045cd68081a85e2beaba0d8ea5d2b7322e9d8303395cf9b8374a7a303"
+      url "https://github.com/deckhouse/dmt/releases/download/v0.2.5/dmt-0.2.5-darwin-arm64.tar.gz"
+      sha256 "3590434bd13124cf09fe9dbb0a74581278705601be5e18ae436ba25682a79d57"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/deckhouse/dmt/releases/download/v0.2.4/dmt-0.2.4-linux-amd64.tar.gz"
-      sha256 "b30df5775ae316d9f3e47e8665ee33dbdadbde69704826e7e63c2456acdffb9b"
+      url "https://github.com/deckhouse/dmt/releases/download/v0.2.5/dmt-0.2.5-linux-amd64.tar.gz"
+      sha256 "ab781e4d1de7a1f12c06efca588605fb636ab7953217cbddbe7cb8bd799c7eb1"
     end
     on_arm do
-      url "https://github.com/deckhouse/dmt/releases/download/v0.2.4/dmt-0.2.4-linux-arm64.tar.gz"
-      sha256 "294775ebd8d0b493d0ad6c51cfccdc55baf92619dac12f22b009b81098e30c71"
+      url "https://github.com/deckhouse/dmt/releases/download/v0.2.5/dmt-0.2.5-linux-arm64.tar.gz"
+      sha256 "0d45abf4ad08f3dd2fc0a93c924ebabebee23568f02a5970ba417ddeab6be9ca"
     end
   end
 
