@@ -1,5 +1,5 @@
 cask "hytale" do
-  version "2026.09.15-261d405"
+  version "2026.09.21-909ac0c"
 
   # `url` has to interpolate `version`: Cask::URL#unversioned? inspects the raw
   # source line and treats any url without `#{` as unversioned, which makes
@@ -8,7 +8,7 @@ cask "hytale" do
   # it to bump-cask-pr, which re-evaluates it per system to learn the new urls.
   on_macos do
     on_arm do
-      sha256 "9e82c8293d756feb6387ba09c5deccc064258d91f0ce0388df56223f756edd01"
+      sha256 "398d69d0778f0856af53048f5ae4669d7b6cc36f92b0ca28cb5769f03c9e3779"
       url "https://launcher.hytale.com/builds/release/darwin/arm64/hytale-launcher-#{version}.dmg"
     end
 
@@ -24,7 +24,7 @@ cask "hytale" do
   end
   on_linux do
     on_intel do
-      sha256 "6c7e6254fd0494d4583a839d1b42bff2ae0bb430c834342a54362e2bae94c5fd"
+      sha256 "59915a56b933ba135241d25617c279d0fb1a49b8f856195dc7fc1c4368f8b55b"
       # The Linux archive holds a single bare executable, not an app bundle.
       url "https://launcher.hytale.com/builds/release/linux/amd64/hytale-launcher-#{version}.zip"
     end

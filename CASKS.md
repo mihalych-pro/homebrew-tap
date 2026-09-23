@@ -4,4 +4,4 @@
 
 | Cask | Description | Platforms | Version | Updated |
 | --- | --- | --- | --- | --- |
-| [hytale](Casks/h/hytale.rb) | Official Hytale Launcher | macOS (arm64), Linux (x86_64) | 2026.09.15-261d405 | 2026-09-16 |
+| [hytale](Casks/h/hytale.rb) | Official Hytale Launcher | macOS (arm64), Linux (x86_64) | 2026.09.21-909ac0c | 2026-09-23 |
