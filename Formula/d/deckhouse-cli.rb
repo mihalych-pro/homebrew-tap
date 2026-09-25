@@ -13,8 +13,8 @@ class DeckhouseCli < Formula
   # Pointing it at the source of the same tag is core's own shape (see
   # `graalvm`) and keeps the formula from claiming an arm64 binary that does not
   # exist. Nothing is ever fetched from it: the requirement fails first.
-  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.33.21.tar.gz"
-  sha256 "2b35a4fab8d1265f8813daced44910f360d438ea7fd6c5cc91e4d54b286346c2"
+  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.33.22.tar.gz"
+  sha256 "0512c4bdab68a8f64226e170d426b37ecefa74a39ab4ba02f78dc27e0bc42f20"
   license "Apache-2.0"
 
   livecheck do

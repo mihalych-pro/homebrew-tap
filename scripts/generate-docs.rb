@@ -48,6 +48,12 @@ module DocsGenerator
   PLATFORMS = [[:macos, :arm], [:macos, :intel], [:linux, :arm], [:linux, :intel]].freeze
   OS_LABELS = { macos: "macOS", linux: "Linux" }.freeze
   ARCH_LABELS = { arm: "arm64", intel: "x86_64" }.freeze
+  # `ArchRequirement` spells an architecture `:x86_64`/`:arm64` where a cask's
+  # `depends_on arch:` and PLATFORMS above say `:intel`/`:arm`, and it accepts
+  # either spelling. Its own `satisfied?` reads the real `Hardware::CPU` rather
+  # than the simulated one, so it cannot answer for a platform we are only
+  # pretending to be.
+  REQUIREMENT_ARCHES = { arm64: :arm, arm: :arm, x86_64: :intel, intel: :intel }.freeze
 
   def tap = Tap.fetch(TAP_NAME)
 
@@ -60,23 +66,31 @@ module DocsGenerator
     collapsed.gsub("|", "\\|")
   end
 
-  # Whether a package resolves on one simulated platform. Asking Homebrew is
-  # what makes this trustworthy: reading the `on_*` blocks would miss
-  # `depends_on arch:`, which a cask uses to rule out an architecture even
-  # though the url for that OS loads perfectly well.
+  # Whether a package is actually available on one simulated platform. Asking
+  # Homebrew is what makes this trustworthy: reading the `on_*` blocks would
+  # miss `depends_on arch:`, which rules an architecture out even where the url
+  # for that OS loads perfectly well -- a cask whose one build is arm-only, or
+  # `deckhouse-cli`, whose source fallback resolves on linux-arm64 purely so
+  # that `brew tap` can load the formula there.
   def available?(kind, path, os, arch)
     Homebrew::SimulateSystem.with(os:, arch:) do
       Homebrew::API.with_no_api_env do
-        if kind == :cask
+        required = if kind == :cask
           cask = Cask::CaskLoader.load(path)
           next false if cask.url.blank?
           next false unless (os == :macos) ? cask.supports_macos? : cask.supports_linux?
 
-          required = cask.depends_on.arch&.filter_map { |entry| entry[:type] }
-          required.blank? || required.include?(arch)
+          cask.depends_on.arch&.filter_map { |entry| entry[:type] }
         else
-          Formulary.factory(path).stable&.url.present?
+          formula = Formulary.factory(path)
+          next false if formula.stable&.url.blank?
+
+          formula.requirements.filter_map do |requirement|
+            REQUIREMENT_ARCHES[requirement.arch] if requirement.is_a?(ArchRequirement)
+          end
         end
+
+        required.blank? || required.include?(arch)
       end
     end
   rescue
