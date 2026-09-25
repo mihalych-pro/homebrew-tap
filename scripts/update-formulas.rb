@@ -153,10 +153,15 @@ module TapUpdater
   # does (see its `FromContentLoader` pass and os x arch product). Re-deriving
   # that here would duplicate subtle logic guarding checksums, so it stays.
   #
-  # Caution: this was observed writing one platform's checksum for a cask with
-  # per-OS `on_macos`/`on_linux` blocks, and then leaving the wrong value in
-  # place on later runs. Prefer keeping cask urls interpolated with nothing but
-  # `version`, which routes them through the rewriter above instead.
+  # Caution: this was observed writing one platform's checksum for a cask that
+  # held a `url`/`sha256` pair inside each `on_macos`/`on_linux` block, and then
+  # leaving the wrong value in place on later runs. `hytale` no longer has that
+  # shape: it builds one url from the `arch`/`os` helpers and lists a top-level
+  # `sha256` per platform, which is what homebrew-cask's own per-platform casks
+  # do and what this command is written against. Its `replace_version_and_checksum`
+  # walks os x arch, skips the architectures a cask's `depends_on arch:` excludes,
+  # and otherwise raises telling you to declare them -- so a cask here must keep
+  # stating unsupported platforms that way.
   #
   # It reports failure by calling `odie`, which raises a catchable SystemExit;
   # turn that into a normal error so one bad package does not end the run.

@@ -69,6 +69,23 @@ tasks:
     cmds:
       - brew style {{if .CLI_ARGS}}{{.REFS}}{{else}}{{.TAP}}{{end}}
       - brew audit --strict {{if .CLI_ARGS}}{{.REFS}}{{else}}--tap={{.TAP}}{{end}}
+      - task: readall
+
+  readall:
+    desc: Load every package for every OS/arch combination, as `brew tap` does
+    summary: |
+      `brew tap` verifies a tap with Readall.valid_tap?, which builds each
+      formula and cask under every entry of OnSystem::ALL_OS_ARCH_COMBINATIONS.
+      A package with no url on one of them -- an architecture upstream does not
+      build for -- fails the whole tap with "Cannot tap ...: invalid syntax in
+      tap!", and neither `brew style` nor `brew audit` reports it.
+
+      It also stays hidden locally: the tap is symlinked here rather than
+      tapped, so `brew tap` never runs against it.
+    cmds:
+      - >-
+        brew ruby -e 'require "readall";
+        exit(1) unless Readall.valid_tap?(Tap.fetch("{{.TAP}}"), aliases: true)'
 
   fix:
     desc: Auto-correct the style offences that RuboCop can fix itself

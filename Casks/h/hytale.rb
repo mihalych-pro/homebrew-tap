@@ -1,20 +1,33 @@
 cask "hytale" do
+  # Upstream lays its downloads out as `<os>/<arch>/hytale-launcher-<version>.zip`,
+  # so the same interpolation homebrew-cask uses for a cask with one build per
+  # platform (see `recordly`) renders every url from these two helpers.
+  arch arm: "arm64", intel: "amd64"
+  os macos: "darwin", linux: "linux"
+
   version "2026.09.21-909ac0c"
+  # Only the two builds that exist: macOS is published for arm64 alone and Linux
+  # for amd64 alone. Both checksums are of the archives that
+  # https://launcher.hytale.com/version/release/launcher.json names -- the same
+  # manifest the livecheck below reads. Upstream also serves an undocumented
+  # darwin `.dmg`, holding the same app under a prettier bundle name; it is
+  # deliberately unused, being absent from that manifest.
+  #
+  # The other two OS/arch pairs render a url upstream does not serve, and the
+  # `depends_on arch:` in each block below is what refuses to install them --
+  # `recordly` states its single Linux build the same way. They still have to
+  # render something, because `brew tap` loads every cask under every OS/arch
+  # pair and one resolving to no url fails the whole tap with "Missing URL".
+  sha256 arm:          "6ce97db29b94aa1eef53eba7ccd41fa0c83bdcd0389ea3e72e69d9cb3dbe445e",
+         x86_64_linux: "59915a56b933ba135241d25617c279d0fb1a49b8f856195dc7fc1c4368f8b55b"
 
-  # `url` has to interpolate `version`: Cask::URL#unversioned? inspects the raw
-  # source line and treats any url without `#{` as unversioned, which makes
-  # `brew audit` demand `sha256 :no_check`. So this cask cannot be bumped by
-  # substitution the way the formulas are, and scripts/update-formulas.rb hands
-  # it to bump-cask-pr, which re-evaluates it per system to learn the new urls.
   on_macos do
-    on_arm do
-      sha256 "398d69d0778f0856af53048f5ae4669d7b6cc36f92b0ca28cb5769f03c9e3779"
-      url "https://launcher.hytale.com/builds/release/darwin/arm64/hytale-launcher-#{version}.dmg"
-    end
-
     depends_on arch: :arm64
 
-    app "Hytale Launcher.app"
+    # The bundle inside the archive is `hytale-launcher.app`; its
+    # CFBundleName is "Hytale Launcher" and its identifier
+    # com.hypixel.hytale-launcher, which the zap paths below key off.
+    app "hytale-launcher.app"
 
     zap trash: [
       "~/Library/Caches/com.hypixel.hytale-launcher",
@@ -23,14 +36,9 @@ cask "hytale" do
     ]
   end
   on_linux do
-    on_intel do
-      sha256 "59915a56b933ba135241d25617c279d0fb1a49b8f856195dc7fc1c4368f8b55b"
-      # The Linux archive holds a single bare executable, not an app bundle.
-      url "https://launcher.hytale.com/builds/release/linux/amd64/hytale-launcher-#{version}.zip"
-    end
-
     depends_on arch: :x86_64
 
+    # The Linux archive holds a single bare executable, not an app bundle.
     binary "hytale-launcher"
 
     # The Linux build stores state under the XDG base directories rather than
@@ -45,6 +53,10 @@ cask "hytale" do
     ]
   end
 
+  # The url interpolates more than `version`, so scripts/update-formulas.rb
+  # cannot render the next one by substitution and hands the cask to
+  # bump-cask-pr, which re-evaluates it once per system to learn the new urls.
+  url "https://launcher.hytale.com/builds/release/#{os}/#{arch}/hytale-launcher-#{version}.zip"
   name "Hytale"
   desc "Official Hytale Launcher"
   homepage "https://hytale.com/"

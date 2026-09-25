@@ -52,13 +52,16 @@ makes `brew audit` report it as "redundant with version scanned from URL".
 
 **Cask urls must interpolate `#{version}`.** `Cask::URL#unversioned?` reads the
 raw source line and calls any url without `#{` unversioned, which makes audit
-demand `sha256 :no_check`. The bump script renders such urls itself, so
-interpolate nothing but `version`.
+demand `sha256 :no_check`. A url that interpolates *only* `version` is rendered
+by the bump script itself; `hytale` interpolates `#{os}`/`#{arch}` too, so it
+falls through to `bump-cask-pr`, which re-evaluates the cask once per system.
+That is the path homebrew-cask's own per-platform casks take.
 
 **Run `task audit` after `task fix`.** `brew style --fix` has reordered
 `Casks/h/hytale.rb` into a state its own `Cask/StanzaOrder` cop rejects. The
-order that passes is: `version`, the `on_macos`/`on_linux` blocks, then
-`name`/`desc`/`homepage`, `livecheck`, `auto_updates`.
+order that passes is: the `arch`/`os` helpers, `version`, `sha256`, the
+`on_macos`/`on_linux` blocks, then `url`, `name`/`desc`/`homepage`,
+`livecheck`, `auto_updates` -- the layout homebrew-cask's `recordly` uses.
 
 **A `livecheck` block with a literal url needs the frozen constant.** With no
 top-level `url`, `FormulaAudit/LivecheckUrlSymbol` compares that url against
@@ -70,6 +73,47 @@ keeps an executable bit that is already set, and a downloaded file has 0644.
 
 **Versions are compared as numbers**: `2.01.3` equals `2.1.3`, so a typo'd
 leading zero reads as "up to date" forever while the url 404s.
+
+**Every OS/arch pair must resolve to a url, including ones upstream does not
+build for.** `brew tap` calls `Readall.valid_tap?` over
+`OnSystem::ALL_OS_ARCH_COMBINATIONS`. A formula resolving to no url on, say,
+linux-arm64 raises `formula requires at least a URL`; a cask resolving to none
+on macOS Intel raises `Missing URL`; either fails the tap as a whole with
+`Cannot tap ...: invalid syntax in tap!`. Verified: neither `depends_on arch:`
+nor `disable!` excuses a missing url -- only a url that resolves does. Follow
+homebrew-core and homebrew-cask:
+
+- A **formula** carries a top-level `url`/`sha256` pointing at the *source* of
+  the same tag, which the `on_macos`/`on_linux` blocks override wherever a
+  binary exists, plus `depends_on arch:` stating the restriction. That is
+  core's own shape -- see `graalvm`, whose top-level url is a source archive
+  and whose `on_macos` block holds nothing but `depends_on arch: :arm64`. Here
+  the source is never fetched: the requirement fails first. Only
+  `deckhouse-cli` needs this; `deckhouse-module-tool`, `flant-flint` and `werf`
+  publish all four binaries.
+- A **cask** builds one url from `arch`/`os` helpers and lists a `sha256` only
+  for the platforms that exist, exactly as homebrew-cask's `recordly` does with
+  its single Linux build. The combinations upstream does not publish render a
+  url that 404s and carry no checksum; `depends_on arch:` in the matching
+  `on_macos`/`on_linux` block is what refuses to install them. `Cask/NoOverrides`
+  forbids a top-level `url`/`sha256` that an `on_*` block overrides, and
+  `Cask/OnSystemConditionals` forbids a `sha256` directly inside `on_macos` or
+  `on_linux`, so this layout is also the only cop-clean one.
+
+Never silence the check by repeating another architecture's artifact under
+`on_arm`/`on_intel`: the package would then advertise a build that does not
+exist, which is what the url pattern above avoids.
+
+`brew style` catches none of this and neither does `brew audit`. `task readall`
+(part of `task audit`) runs the same check `brew tap` does. After touching a
+package's url or `sha256` layout, also run
+`task update -- <name> --set <any newer version> --dry-run`: the shapes that
+satisfy `Readall` are not all shapes the bump script can rewrite.
+
+The failure is invisible locally while the tap is symlinked, because `brew tap`
+never runs on it -- and invisible on a machine that has not trusted the tap,
+because untrusted files are skipped before verification. It surfaces on a fresh
+machine whose `trust.json` arrived with the dotfiles.
 
 **Never edit a `bottle do` block** — BrewTestBot owns those checksums.
 
