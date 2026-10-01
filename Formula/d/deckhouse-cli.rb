@@ -13,8 +13,8 @@ class DeckhouseCli < Formula
   # Pointing it at the source of the same tag is core's own shape (see
   # `graalvm`) and keeps the formula from claiming an arm64 binary that does not
   # exist. Nothing is ever fetched from it: the requirement fails first.
-  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.33.22.tar.gz"
-  sha256 "0512c4bdab68a8f64226e170d426b37ecefa74a39ab4ba02f78dc27e0bc42f20"
+  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.33.23.tar.gz"
+  sha256 "0de3f971bd53d680f47790eec278670ea8c9b8a09f56f7528766fad654ff16b4"
   license "Apache-2.0"
 
   livecheck do
@@ -24,12 +24,12 @@ class DeckhouseCli < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.22/d8-v0.33.22-darwin-amd64.tar.gz"
-      sha256 "56ef249f3108b9f3b71bb15dfabec0bb730aceae9fd6a0149e2cd20d50c8fa93"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-darwin-amd64.tar.gz"
+      sha256 "a8d604be831f7315ab00ac20bc7c9d4dc1134d0e9acbd4ebcc718a6256d41762"
     end
     on_arm do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.22/d8-v0.33.22-darwin-arm64.tar.gz"
-      sha256 "3880ca32184a08d42de8659a241b3593bb193e690f5ddc106dfc5aee53dc01c6"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-darwin-arm64.tar.gz"
+      sha256 "67a1b165a5083c18981fb3713d8e182fd134a96715d1245d3e2af58c5efa6c63"
     end
   end
 
@@ -37,8 +37,8 @@ class DeckhouseCli < Formula
     depends_on arch: :x86_64
 
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.22/d8-v0.33.22-linux-amd64.tar.gz"
-      sha256 "e7ebf0a6cbf446f44f65313391d9f11ab35e3a076eb819ac18d070544ff8529e"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-linux-amd64.tar.gz"
+      sha256 "c050a9472f45cc9f0a117d64f1c55594c8d99dda264272cbd9f83c97694593ef"
     end
   end
 
