@@ -13,8 +13,8 @@ class DeckhouseCli < Formula
   # Pointing it at the source of the same tag is core's own shape (see
   # `graalvm`) and keeps the formula from claiming an arm64 binary that does not
   # exist. Nothing is ever fetched from it: the requirement fails first.
-  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.33.23.tar.gz"
-  sha256 "0de3f971bd53d680f47790eec278670ea8c9b8a09f56f7528766fad654ff16b4"
+  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.34.3.tar.gz"
+  sha256 "29c9e452ffe696a4ba449601e2d09db38e849dc40d4e81e4f50649ad5a7a8fb4"
   license "Apache-2.0"
 
   livecheck do
@@ -24,12 +24,12 @@ class DeckhouseCli < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-darwin-amd64.tar.gz"
-      sha256 "a8d604be831f7315ab00ac20bc7c9d4dc1134d0e9acbd4ebcc718a6256d41762"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.3/d8-v0.34.3-darwin-amd64.tar.gz"
+      sha256 "79ca40912d0b63ef84a5cabf878ee7f4403b9b7db8b7f9c9365264a578344c52"
     end
     on_arm do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-darwin-arm64.tar.gz"
-      sha256 "67a1b165a5083c18981fb3713d8e182fd134a96715d1245d3e2af58c5efa6c63"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.3/d8-v0.34.3-darwin-arm64.tar.gz"
+      sha256 "9de895fcac5239fbaa7f0dcba1d6e3c4491d4a22406f4bc8d68013bff034b09d"
     end
   end
 
@@ -37,8 +37,8 @@ class DeckhouseCli < Formula
     depends_on arch: :x86_64
 
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.33.23/d8-v0.33.23-linux-amd64.tar.gz"
-      sha256 "c050a9472f45cc9f0a117d64f1c55594c8d99dda264272cbd9f83c97694593ef"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.3/d8-v0.34.3-linux-amd64.tar.gz"
+      sha256 "236ceaceac48d2c50c00e2479de451d245595b25d4ae24094679c82f677955b9"
     end
   end
 
