@@ -4,7 +4,7 @@ vars:
   TAP: mihalych-pro/tap
   # Packages this tap actually owns; `test` installs them, everything else
   # works across the whole tap.
-  MAINTAINED: deckhouse-cli deckhouse-module-tool flant-flint werf
+  MAINTAINED: deckhouse-cli deckhouse-module-tool flant-flint onion-gen werf
 
 env:
   HOMEBREW_NO_AUTO_UPDATE: "1"

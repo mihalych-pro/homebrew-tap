@@ -89,8 +89,8 @@ homebrew-core and homebrew-cask:
   core's own shape -- see `graalvm`, whose top-level url is a source archive
   and whose `on_macos` block holds nothing but `depends_on arch: :arm64`. Here
   the source is never fetched: the requirement fails first. Only
-  `deckhouse-cli` needs this; `deckhouse-module-tool`, `flant-flint` and `werf`
-  publish all four binaries.
+  `deckhouse-cli` needs this; `deckhouse-module-tool`, `flant-flint`,
+  `onion-gen` and `werf` publish all four binaries.
 - A **cask** builds one url from `arch`/`os` helpers and lists a `sha256` only
   for the platforms that exist, exactly as homebrew-cask's `recordly` does with
   its single Linux build. The combinations upstream does not publish render a

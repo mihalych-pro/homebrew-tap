@@ -17,6 +17,7 @@
 #   Formulary / Cask::CaskLoader         the package objects
 #   Homebrew::Livecheck                  what the latest version is
 #   Resource#fetch + Pathname#sha256     checksums, via brew's own cache
+#   Utils::Curl                          the `<url>.sha256` upstream may publish
 #   Utils::AST                           parsing and rewriting the .rb files
 #   Homebrew::DevCmd::BumpCaskPr         casks, as a class rather than a fork
 #
@@ -43,6 +44,7 @@ require "dev-cmd/bump-cask-pr"
 require "livecheck/livecheck"
 require "resource"
 require "utils/ast"
+require "utils/curl"
 require "utils/output"
 require "utils/tar"
 
@@ -249,16 +251,40 @@ module TapUpdater
     end
   end
 
+  # The checksum upstream publishes beside an artifact as `<url>.sha256`, in
+  # `sha256sum` format, or nil when there is none. A sidecar naming some other
+  # file is an upstream mistake worth stopping on, not something to fall back
+  # from.
+  def published_checksum(url)
+    result = Utils::Curl.curl_output("--fail", "--location", "#{url}.sha256")
+    return unless result.success?
+
+    match = result.stdout.match(/\A(\h{64})\s+\*?(\S+)\s*\z/)
+    return if match.nil?
+
+    expected_name = File.basename(URI(url).path)
+    raise "#{url}.sha256 describes #{match[2]}, not #{expected_name}" if match[2] != expected_name
+
+    match[1].downcase
+  end
+
   def checksum_for(name, url, version)
     resource = Resource.new
     resource.url(url)
     resource.owner = Resource.new(name)
     resource.version(version.to_s)
 
-    # The checksum is what we are here to compute, so there is nothing to
-    # verify against: without these flags every artifact prints a progress bar
-    # and a "Cannot verify integrity" warning, which buries the real output.
-    file = resource.fetch(verify_download_integrity: false, quiet: true)
+    # With a published checksum the download is verified against it, so a
+    # binary that differs from what upstream signed off on is never written
+    # into the formula. Without one there is nothing to verify against: these
+    # flags keep every artifact from printing a progress bar and a "Cannot
+    # verify integrity" warning, which would bury the real output.
+    if (published = published_checksum(url))
+      resource.sha256(published)
+      file = resource.fetch(quiet: true)
+    else
+      file = resource.fetch(verify_download_integrity: false, quiet: true)
+    end
     Utils::Tar.validate_file(file)
     file.sha256
   end
