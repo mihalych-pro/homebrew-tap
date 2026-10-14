@@ -20,23 +20,23 @@ class Werf < Formula
 
   on_macos do
     on_intel do
-      url "https://tuf.werf.io/targets/releases/2.79.2/darwin-amd64/bin/werf"
-      sha256 "4664a93e364a0c88bea75b08b58727e2c71ef54835c50ca3719eda45955f83ce"
+      url "https://tuf.werf.io/targets/releases/2.80.2/darwin-amd64/bin/werf"
+      sha256 "e8f026fe7f958db26929b515287f327fae46945669b24abaf009d2190f08507d"
     end
     on_arm do
-      url "https://tuf.werf.io/targets/releases/2.79.2/darwin-arm64/bin/werf"
-      sha256 "79372c412fc49ae2093cfc106bf476f6b4fe0f2ea9900ca236da7e0d3e9bf0d0"
+      url "https://tuf.werf.io/targets/releases/2.80.2/darwin-arm64/bin/werf"
+      sha256 "d1ad1a35dd58f9f0c9ef602263a8a3ac132636f6affd8254508c8aa31e49345d"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://tuf.werf.io/targets/releases/2.79.2/linux-amd64/bin/werf"
-      sha256 "16feb4b5effa52ca653334d3c6ece1e0b9f1343cb0e72cb7e3f80a288d254e66"
+      url "https://tuf.werf.io/targets/releases/2.80.2/linux-amd64/bin/werf"
+      sha256 "96516fb562135d4ceb1fcedde5635a5cdab0589991728b28984909dd392f9d2b"
     end
     on_arm do
-      url "https://tuf.werf.io/targets/releases/2.79.2/linux-arm64/bin/werf"
-      sha256 "eac10514acfd292c76eb151a7f86985ad297fe49306e484d64338fc87d00c919"
+      url "https://tuf.werf.io/targets/releases/2.80.2/linux-arm64/bin/werf"
+      sha256 "6c13e931f596214ff5223aedf5427d82f3a78b37bdb219346261bc6676bacc41"
     end
   end
 
