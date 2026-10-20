@@ -1,11 +1,11 @@
-class Werf < Formula
+class WerfAT2 < Formula
   # Held in a constant rather than inlined below: with no top-level `url`,
   # FormulaAudit/LivecheckUrlSymbol compares a literal livecheck URL against
   # itself and autocorrects it to `url :stable`, pointing livecheck at a binary.
   #
-  # GitHub tags run ahead of what is actually released -- 3.x is tagged but has
-  # no trdl channel yet, so 2/stable is the current stable werf. Bump the `2`
-  # once upstream promotes a new major series.
+  # The channel only ever names a 2.x release, which is what pins this formula
+  # to the series. Aliases/werf points here, which is why this one is linked
+  # and werf@3 is keg-only.
   STABLE_CHANNEL = "https://tuf.werf.io/targets/channels/2/stable".freeze
 
   desc "Consistent delivery tool for Kubernetes"
