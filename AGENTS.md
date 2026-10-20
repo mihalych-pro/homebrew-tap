@@ -27,10 +27,10 @@ files that never reach your commit.
 ```sh
 task check                 # what is outdated (formulae and casks, separately)
 task update                # bump everything outdated
-task update -- werf        # …or just one, --dry-run and --set VERSION also work
+task update -- werf@2      # …or just one, --dry-run and --set VERSION also work
 task docs                  # regenerate FORMULAE.md / CASKS.md
 task audit                 # brew style + brew audit --strict over the tap
-task audit -- werf         # …or just one package
+task audit -- werf@2       # …or just one package
 task fix                   # brew style --fix
 task test                  # install and run the test block of each formula
 ```
@@ -66,7 +66,7 @@ order that passes is: the `arch`/`os` helpers, `version`, `sha256`, the
 **A `livecheck` block with a literal url needs the frozen constant.** With no
 top-level `url`, `FormulaAudit/LivecheckUrlSymbol` compares that url against
 itself and "corrects" it to `url :stable`, which points livecheck at a binary.
-Assign it to a constant (see `Formula/w/werf.rb`) and reference that.
+Assign it to a constant (see `Formula/w/werf@2.rb`) and reference that.
 
 **A bare binary needs `chmod 0555` in `install`.** Homebrew's `Cleaner` only
 keeps an executable bit that is already set, and a downloaded file has 0644.
@@ -90,7 +90,7 @@ homebrew-core and homebrew-cask:
   and whose `on_macos` block holds nothing but `depends_on arch: :arm64`. Here
   the source is never fetched: the requirement fails first. Only
   `deckhouse-cli` needs this; `deckhouse-module-tool`, `flant-flint`,
-  `onion-gen` and `werf` publish all four binaries.
+  `onion-gen`, `werf@2` and `werf@3` publish all four binaries.
 - A **cask** builds one url from `arch`/`os` helpers and lists a `sha256` only
   for the platforms that exist, exactly as homebrew-cask's `recordly` does with
   its single Linux build. The combinations upstream does not publish render a
@@ -120,8 +120,35 @@ machine whose `trust.json` arrived with the dotfiles.
 **A bare name resolves to `homebrew/core` first.** Check
 `brew info --json=v2 --formula <name>` before naming anything: it reports the tap
 a name actually resolves to. `flant-flint` is named that way because core's
-`flint` is an unrelated library — and note `werf` here is shadowed by core's
-`werf` at the same version, so only `mihalych-pro/tap/werf` reaches this one.
+`flint` is an unrelated library — and note core's `werf` (2.x, from source)
+shadows the bare name, so only `mihalych-pro/tap/werf` reaches the alias below.
+
+**werf is two versioned formulae plus an alias, as core does for `openssl`.**
+`Formula/w/werf@2.rb` (`WerfAT2`) and `Formula/w/werf@3.rb` (`WerfAT3`) are
+the real formulae; each livecheck sees only its own series. `Aliases/werf` is a
+symlink to whichever is the default, and that one is linked while the other
+carries `keg_only :versioned_formula`, since both install `bin/werf`. There is
+no `Formula/w/werf.rb`, and none must be added: the alias wins name resolution,
+so such a file would be silently unreachable -- `brew audit` does not notice.
+
+To make 3.x the default -- once upstream publishes `channels/3/stable`:
+
+1. `ln -sfn ../Formula/w/werf@3.rb Aliases/werf`
+2. Move `keg_only :versioned_formula` from `werf@3.rb` to `werf@2.rb`.
+3. Point `werf@3`'s livecheck at `channels/3/stable` (`:page_match`, like
+   `werf@2`) instead of GitHub releases.
+4. `task docs`, `task audit`.
+
+Installs made through `mihalych-pro/tap/werf` record the alias, so
+`brew upgrade` follows it to the new target and unlinks the old keg
+(`Formula#latest_formula`, `follow_installed_alias`). Installs made by an
+explicit `werf@2` stay where they are.
+
+Do not add `werf` to `formula_renames.json`: `brew audit --tap` rejects a name
+that is both an alias and a rename, and it is not needed -- `possible_names`
+includes aliases, so an old `Cellar/werf` keg from this tap already counts as an
+installed `werf@2`. The same rule means a machine with core's `werf` installed
+must uninstall it before installing the tap's alias target.
 
 ## Test blocks
 

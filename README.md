@@ -48,7 +48,7 @@ brew install --cask hytale
 ```
 
 Trusting the tap is a single decision covering everything in it. To be narrower,
-vouch per package — `brew trust --formula mihalych-pro/tap/werf`,
+vouch per package — `brew trust --formula mihalych-pro/tap/werf@2`,
 `brew trust --cask mihalych-pro/tap/hytale` — and `brew untrust` reverses either.
 
 ## Everyday commands

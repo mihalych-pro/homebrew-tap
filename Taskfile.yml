@@ -4,7 +4,7 @@ vars:
   TAP: mihalych-pro/tap
   # Packages this tap actually owns; `test` installs them, everything else
   # works across the whole tap.
-  MAINTAINED: deckhouse-cli deckhouse-module-tool flant-flint onion-gen werf
+  MAINTAINED: deckhouse-cli deckhouse-module-tool flant-flint onion-gen werf@2 werf@3
 
 env:
   HOMEBREW_NO_AUTO_UPDATE: "1"
@@ -30,9 +30,9 @@ tasks:
         brew trust --tap mihalych-pro/tap
 
       Pass names to limit the run, or extra flags after --:
-        task update -- werf wesnoth
+        task update -- werf@2 wesnoth
         task update -- --dry-run
-        task update -- werf --set 2.76.0
+        task update -- werf@2 --set 2.76.0
 
       Recomputing per-platform checksums re-downloads the artifacts; a full
       werf bump moves roughly 450 MB.
@@ -63,7 +63,7 @@ tasks:
       - brew ruby scripts/generate-docs.rb -- {{.CLI_ARGS}}
 
   audit:
-    desc: Style and audit the tap (pass names to limit, e.g. task audit -- werf)
+    desc: Style and audit the tap (pass names to limit, e.g. task audit -- werf@2)
     vars:
       REFS: '{{range $n := splitList " " .CLI_ARGS}}{{if $n}}{{$.TAP}}/{{$n}} {{end}}{{end}}'
     cmds:

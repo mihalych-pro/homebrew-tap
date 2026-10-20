@@ -33,8 +33,15 @@ $ brew install mihalych-pro/tap/deckhouse-cli
 **Prefer the second form.** A bare name resolves to `homebrew/core` first, so it
 does not always reach this tap:
 
-- `werf` exists in core as well, at the same version. `brew install werf` gets
-  core's build-from-source formula; only `mihalych-pro/tap/werf` gets this one.
+- `werf` exists in core as well, built from source. `brew install werf` gets
+  that; `mihalych-pro/tap/werf` gets this tap's default werf, currently 2.x.
+  Here `werf` is an alias for `werf@2` and will move to `werf@3` once werf 3
+  reaches a stable channel; installs made through the alias follow it on
+  `brew upgrade`. Pin a series by naming it: `mihalych-pro/tap/werf@2` or
+  `mihalych-pro/tap/werf@3`. The one the alias does not point at is keg-only,
+  so run it as `$(brew --prefix werf@3)/bin/werf`, or put that directory on
+  `PATH`. Uninstall core's `werf` first: Homebrew counts it as an installed
+  version of the alias target and refuses to mix taps.
 - `flant-flint` is deliberately not called `flint` for the same reason, since
   core's `flint` is an unrelated number-theory library.
 
