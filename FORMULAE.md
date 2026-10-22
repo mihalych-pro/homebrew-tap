@@ -8,4 +8,4 @@
 | [deckhouse-module-tool](Formula/d/deckhouse-module-tool.rb) | Linter, renderer and test runner for Deckhouse modules | macOS (arm64, x86_64), Linux (arm64, x86_64) | 0.2.5 | 2026-09-17 |
 | [onion-gen](Formula/o/onion-gen.rb) | Vanity address generator for Tor Onion Service v3 | macOS (arm64, x86_64), Linux (arm64, x86_64) | 1.0.2 | 2026-10-09 |
 | [werf@2](Formula/w/werf@2.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 2.80.2 | 2026-10-15 |
-| [werf@3](Formula/w/werf@3.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 3.8.0 | 2026-10-15 |
+| [werf@3](Formula/w/werf@3.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 3.11.0 | 2026-10-22 |
