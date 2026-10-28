@@ -7,5 +7,5 @@
 | [deckhouse-cli](Formula/d/deckhouse-cli.rb) | Command-line client for the Deckhouse Kubernetes Platform | macOS (arm64, x86_64), Linux (x86_64) | 0.34.6 | 2026-10-15 |
 | [deckhouse-module-tool](Formula/d/deckhouse-module-tool.rb) | Linter, renderer and test runner for Deckhouse modules | macOS (arm64, x86_64), Linux (arm64, x86_64) | 0.2.7 | 2026-10-27 |
 | [onion-gen](Formula/o/onion-gen.rb) | Vanity address generator for Tor Onion Service v3 | macOS (arm64, x86_64), Linux (arm64, x86_64) | 1.0.2 | 2026-10-09 |
-| [werf@2](Formula/w/werf@2.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 2.81.4 | 2026-10-22 |
+| [werf@2](Formula/w/werf@2.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 2.83.0 | 2026-10-28 |
 | [werf@3](Formula/w/werf@3.rb) | Consistent delivery tool for Kubernetes | macOS (arm64, x86_64), Linux (arm64, x86_64) | 3.12.1 | 2026-10-23 |
