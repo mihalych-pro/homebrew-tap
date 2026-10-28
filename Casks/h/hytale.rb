@@ -5,7 +5,7 @@ cask "hytale" do
   arch arm: "arm64", intel: "amd64"
   os macos: "darwin", linux: "linux"
 
-  version "2026.10.23-53cde5e"
+  version "2026.10.26-7b63bde"
   # Only the two builds that exist: macOS is published for arm64 alone and Linux
   # for amd64 alone. Both checksums are of the archives that
   # https://launcher.hytale.com/version/release/launcher.json names -- the same
@@ -18,8 +18,8 @@ cask "hytale" do
   # `recordly` states its single Linux build the same way. They still have to
   # render something, because `brew tap` loads every cask under every OS/arch
   # pair and one resolving to no url fails the whole tap with "Missing URL".
-  sha256 arm:          "622b06d0371bb3efafca4657659fbee213f24dc5429a7fdcb18c3b881b46c44e",
-         x86_64_linux: "7df1351b38a6ae0bcf5d9a681c10911fe305a0ee708edf3f1323fb3242755c9e"
+  sha256 arm:          "0d606d9c86e07a78f3a3800777cd217ea97b51511413aeb8e22bfd49a8056c2d",
+         x86_64_linux: "480a38a95b33c9ed0f303abf49c0fad836378a56f169e46287ceedaa7e5c01b1"
 
   on_macos do
     depends_on arch: :arm64
