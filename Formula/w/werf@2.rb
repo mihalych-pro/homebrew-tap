@@ -4,8 +4,7 @@ class WerfAT2 < Formula
   # itself and autocorrects it to `url :stable`, pointing livecheck at a binary.
   #
   # The channel only ever names a 2.x release, which is what pins this formula
-  # to the series. Aliases/werf points here, which is why this one is linked
-  # and werf@3 is keg-only.
+  # to the series.
   STABLE_CHANNEL = "https://tuf.werf.io/targets/channels/2/stable".freeze
 
   desc "Consistent delivery tool for Kubernetes"
@@ -17,6 +16,10 @@ class WerfAT2 < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
     strategy :page_match
   end
+
+  # Aliases/werf points at werf@3, the default since 3.x reached a stable
+  # channel, so this one is not linked: both install `bin/werf`.
+  keg_only :versioned_formula
 
   on_macos do
     on_intel do
@@ -39,6 +42,10 @@ class WerfAT2 < Formula
       sha256 "933f8abbeee702e12806d6f8a4d0403dcac61f00b20900910cbc11de644baddf"
     end
   end
+
+  # `werf config graph` in the test reports telemetry to telemetry.werf.io;
+  # the test must not phone home. Install only runs `werf completion`, offline.
+  deny_network_access! :test
 
   def install
     bin.install "werf"

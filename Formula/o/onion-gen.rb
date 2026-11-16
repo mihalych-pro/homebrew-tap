@@ -5,6 +5,9 @@ class OnionGen < Formula
 
   livecheck do
     url :stable
+    # The latest GitHub release rather than tags, which livecheck would read by
+    # default: the binaries are release assets, attached only once the release
+    # workflow finishes after the tag.
     strategy :github_latest
   end
 
