@@ -166,13 +166,7 @@ Most `brew` commands can accept a cask token as an argument. As described above,
 - A simple token, _e.g._: `firefox`.
 - A fully-qualified token which includes the tap, _e.g._: `homebrew/cask/firefox`.
 
-`brew` also accepts three other forms as arguments:
-
-- A path to a cask file, _e.g._: `/opt/homebrew/Library/Taps/homebrew/homebrew-cask/Casks/f/firefox.rb`.
-- A `curl`-retrievable URI to a cask file, _e.g._: `https://raw.githubusercontent.com/Homebrew/homebrew-cask/HEAD/Casks/f/firefox.rb`.
-- A file in the current working directory, _e.g._: `my-modified-firefox.rb`. Note that matching tapped cask tokens will be preferred over this form when there is a conflict. To force the use of a cask file in the current directory, specify a pathname with slashes, _e.g._: `./firefox.rb`.
-
-The last three forms are intended for users who wish to maintain private casks.
+Since Homebrew 7.0.13 those are the only forms: a path or a URL to a cask file fails with "Invalid cask name". To maintain private casks, put them in a tap, as described below.
 
 ## Taps
 

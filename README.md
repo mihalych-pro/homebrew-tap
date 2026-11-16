@@ -22,8 +22,8 @@ and the day it landed.
 The shortest path needs no setup — a fully-qualified name works straight away:
 
 ```bash
-brew install mihalych-pro/tap/deckhouse-cli      # a formula
-brew install --cask mihalych-pro/tap/hytale      # a cask
+brew install mihalych-pro/tap/deckhouse-cli           # a formula
+brew install --cask mihalych-pro/tap/hytale-launcher  # a cask
 ```
 
 This is the recommended form, and it removes any ambiguity: a bare name resolves
@@ -44,12 +44,14 @@ Short names then work as usual:
 
 ```bash
 brew install deckhouse-cli
-brew install --cask hytale
+brew install --cask kurlo
 ```
 
 Trusting the tap is a single decision covering everything in it. To be narrower,
-vouch per package — `brew trust --formula mihalych-pro/tap/werf@2`,
-`brew trust --cask mihalych-pro/tap/hytale` — and `brew untrust` reverses either.
+vouch per package — `brew trust --formula mihalych-pro/tap/werf@3`,
+`brew trust --cask mihalych-pro/tap/kurlo` — and `brew untrust` reverses either.
+Trust is granted to the canonical name, not to an alias: when `werf` moves to a
+new series, the new `werf@N` needs trusting too.
 
 ## Everyday commands
 
@@ -58,14 +60,13 @@ brew upgrade                       # upgrade everything, this tap included
 brew upgrade deckhouse-cli         # or just one package
 brew outdated                      # what has a newer version
 brew uninstall deckhouse-cli
-brew uninstall --cask hytale
+brew uninstall --cask kurlo
 brew info mihalych-pro/tap/werf    # version, homepage, installed files
 ```
 
-`d8`, `werf` and `flint` install their own shell completions, so `d8 <tab>` and
-friends work once
-[completions are enabled](https://docs.brew.sh/Shell-Completion). `dmt` ships
-none — it has no `completion` subcommand upstream.
+`d8`, `dmt`, `werf` and `flint` install their own shell completions, so
+`d8 <tab>` and friends work once
+[completions are enabled](https://docs.brew.sh/Shell-Completion).
 
 ## Notes worth knowing
 
