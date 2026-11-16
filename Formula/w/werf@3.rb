@@ -3,25 +3,20 @@ class WerfAT3 < Formula
   # FormulaAudit/LivecheckUrlSymbol compares a literal livecheck URL against
   # itself and autocorrects it to `url :stable`, pointing livecheck at a binary.
   #
-  # 3.x has only a `3/dev` trdl channel so far, no `3/stable`, so the newest
-  # 3.x GitHub release not marked pre-release stands in for it; werf marks the
-  # build currently sitting in alpha/beta/ea/dev as a pre-release. Switch to
-  # channels/3/stable, as werf@2 uses 2/stable, once upstream publishes it.
-  RELEASES = "https://github.com/werf/werf".freeze
+  # The channel only ever names a 3.x release, which is what pins this formula
+  # to the series. Aliases/werf points here, which is why this one is linked
+  # and werf@2 is keg-only.
+  STABLE_CHANNEL = "https://tuf.werf.io/targets/channels/3/stable".freeze
 
   desc "Consistent delivery tool for Kubernetes"
   homepage "https://werf.io/"
   license "Apache-2.0"
 
   livecheck do
-    url RELEASES
-    regex(/^v?(3(?:\.\d+)+)$/i)
-    strategy :github_releases
+    url STABLE_CHANNEL
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :page_match
   end
-
-  # Aliases/werf points at werf@2 until 3.x reaches a stable channel; moving
-  # the alias here also moves this keg_only to werf@2.
-  keg_only :versioned_formula
 
   on_macos do
     on_intel do
@@ -44,6 +39,10 @@ class WerfAT3 < Formula
       sha256 "e768cdd1f0251648064c5ecaec92b133cf590a7cbd47c21b73a4b692e602b9a0"
     end
   end
+
+  # `werf config graph` in the test reports telemetry to telemetry.werf.io;
+  # the test must not phone home. Install only runs `werf completion`, offline.
+  deny_network_access! :test
 
   def install
     bin.install "werf"

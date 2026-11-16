@@ -7,6 +7,9 @@ class DeckhouseModuleTool < Formula
 
   livecheck do
     url :stable
+    # The latest GitHub release rather than tags, which livecheck would read by
+    # default: the binaries are release assets, and a tag has preceded its
+    # release by up to a day (v0.2.8).
     strategy :github_latest
   end
 
@@ -34,6 +37,7 @@ class DeckhouseModuleTool < Formula
 
   def install
     bin.install "dmt"
+    generate_completions_from_executable(bin/"dmt", shell_parameter_format: :cobra)
   end
 
   test do
@@ -54,5 +58,7 @@ class DeckhouseModuleTool < Formula
     output = shell_output("#{bin}/dmt lint #{testpath}/testmod 2>&1", 1)
     assert_match "definition-file", output
     assert_match "Lint failed", output
+
+    assert_match "#compdef dmt", (zsh_completion/"_dmt").read
   end
 end

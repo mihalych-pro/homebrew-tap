@@ -19,6 +19,9 @@ class DeckhouseCli < Formula
 
   livecheck do
     url :stable
+    # The latest GitHub release rather than tags, which livecheck would read by
+    # default: the binaries are release assets, and a tag has preceded its
+    # release by up to three days (v0.33.29).
     strategy :github_latest
   end
 

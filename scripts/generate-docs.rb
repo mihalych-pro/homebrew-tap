@@ -66,6 +66,14 @@ module DocsGenerator
     collapsed.gsub("|", "\\|")
   end
 
+  # By full name, the way `brew` itself resolves a package: since 7.0.13
+  # Formulary.factory and CaskLoader.load refuse a file path, and the
+  # from_path loaders that still take one are internal to Homebrew.
+  def load_package(kind, path)
+    ref = "#{TAP_NAME}/#{path.basename(".rb")}"
+    (kind == :cask) ? Cask::CaskLoader.load(ref) : Formulary.factory(ref)
+  end
+
   # Whether a package is actually available on one simulated platform. Asking
   # Homebrew is what makes this trustworthy: reading the `on_*` blocks would
   # miss `depends_on arch:`, which rules an architecture out even where the url
@@ -76,13 +84,13 @@ module DocsGenerator
     Homebrew::SimulateSystem.with(os:, arch:) do
       Homebrew::API.with_no_api_env do
         required = if kind == :cask
-          cask = Cask::CaskLoader.load(path)
+          cask = load_package(:cask, path)
           next false if cask.url.blank?
           next false unless (os == :macos) ? cask.supports_macos? : cask.supports_linux?
 
           cask.depends_on.arch&.filter_map { |entry| entry[:type] }
         else
-          formula = Formulary.factory(path)
+          formula = load_package(:formula, path)
           next false if formula.stable&.url.blank?
 
           formula.requirements.filter_map do |requirement|
@@ -128,7 +136,7 @@ module DocsGenerator
 
     Homebrew::API.with_no_api_env do
       files.filter_map do |path|
-        package = (kind == :cask) ? Cask::CaskLoader.load(path) : Formulary.factory(path)
+        package = load_package(kind, path)
         Entry.new(
           name:        (kind == :cask) ? package.token : package.name,
           description: package.desc,
@@ -188,7 +196,7 @@ module DocsGenerator
 
     SECTIONS.each_key do |kind|
       path, contents = render(kind, today)
-      current = path.exist? ? path.read : nil
+      current = path.read if path.exist?
 
       if current == contents
         puts "#{path.basename}: up to date"

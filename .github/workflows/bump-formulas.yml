@@ -25,9 +25,10 @@ jobs:
   bump:
     # ubuntu rather than macos: the rewriter walks the AST and refreshes every
     # platform's url/sha256 regardless of the host, so nothing here needs macOS
-    # — and Linux runners bill without the 10x macOS multiplier. Note that a
-    # Linux *arm* runner would not work: deckhouse-cli publishes no
-    # linux-arm64 asset, so the formula has no url to load on that platform.
+    # — and Linux runners bill without the 10x macOS multiplier. Keep it x86_64:
+    # every Linux build in the tap exists for amd64, while deckhouse-cli and the
+    # casks have none for arm64, so only here does `task audit --online` see
+    # every package's real Linux artifact.
     runs-on: ubuntu-latest
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"

@@ -64,11 +64,16 @@ tasks:
 
   audit:
     desc: Style and audit the tap (pass names to limit, e.g. task audit -- werf@2)
+    summary: |
+      The audit runs `--online`: only then does it download and unpack each
+      artifact and compare a cask's `depends_on macos:` with the minimum the
+      bundle declares. Offline it passed a cask whose archive brew could not
+      unpack, so nothing installed. It checks the current platform only.
     vars:
       REFS: '{{range $n := splitList " " .CLI_ARGS}}{{if $n}}{{$.TAP}}/{{$n}} {{end}}{{end}}'
     cmds:
       - brew style {{if .CLI_ARGS}}{{.REFS}}{{else}}{{.TAP}}{{end}}
-      - brew audit --strict {{if .CLI_ARGS}}{{.REFS}}{{else}}--tap={{.TAP}}{{end}}
+      - brew audit --strict --online {{if .CLI_ARGS}}{{.REFS}}{{else}}--tap={{.TAP}}{{end}}
       - task: readall
 
   readall:

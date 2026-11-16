@@ -34,13 +34,12 @@ $ brew install mihalych-pro/tap/deckhouse-cli
 does not always reach this tap:
 
 - `werf` exists in core as well, built from source. `brew install werf` gets
-  that; `mihalych-pro/tap/werf` gets this tap's default werf, currently 2.x.
-  Here `werf` is an alias for `werf@2` and will move to `werf@3` once werf 3
-  reaches a stable channel; installs made through the alias follow it on
-  `brew upgrade`. Pin a series by naming it: `mihalych-pro/tap/werf@2` or
-  `mihalych-pro/tap/werf@3`. The one the alias does not point at is keg-only,
-  so run it as `$(brew --prefix werf@3)/bin/werf`, or put that directory on
-  `PATH`. Uninstall core's `werf` first: Homebrew counts it as an installed
+  that; `mihalych-pro/tap/werf` gets this tap's default werf, currently 3.x.
+  Here `werf` is an alias for `werf@3`; installs made through the alias follow
+  it to the next series on `brew upgrade`. Pin a series by naming it:
+  `mihalych-pro/tap/werf@2` or `mihalych-pro/tap/werf@3`. The one the alias
+  does not point at is keg-only, so run it as `$(brew --prefix werf@2)/bin/werf`,
+  or put that directory on `PATH`. Uninstall core's `werf` first: Homebrew counts it as an installed
   version of the alias target and refuses to mix taps.
 - `flant-flint` is deliberately not called `flint` for the same reason, since
   core's `flint` is an unrelated number-theory library.
@@ -85,24 +84,25 @@ Details about a formula, installed or not:
 
 ```console
 $ brew info mihalych-pro/tap/werf
-==> mihalych-pro/tap/werf: stable 2.75.3
+==> mihalych-pro/tap/werf@3: stable 3.12.1
 Consistent delivery tool for Kubernetes
 https://werf.io/
-From: ssh://git@github.com/mihalych-pro/homebrew-tap.git/Formula/w/werf.rb
+Aliases: werf
+From: ssh://git@github.com/mihalych-pro/homebrew-tap.git/Formula/w/werf@3.rb
 Tap: mihalych-pro/tap
 License: Apache-2.0
 ==> Installed Versions
-werf 2.75.3 (7 files, 103.8MB) [Linked]
+werf@3 3.12.1 (7 files, 219.6MB) [Linked]
 ```
 
 Which files a formula installed:
 
 ```console
 $ brew list --formula werf
-/opt/homebrew/Cellar/werf/2.75.3/bin/werf
-/opt/homebrew/Cellar/werf/2.75.3/etc/bash_completion.d/werf
-/opt/homebrew/Cellar/werf/2.75.3/share/zsh/site-functions/_werf
-/opt/homebrew/Cellar/werf/2.75.3/share/fish/vendor_completions.d/werf.fish
+/opt/homebrew/Cellar/werf@3/3.12.1/bin/werf
+/opt/homebrew/Cellar/werf@3/3.12.1/etc/bash_completion.d/werf
+/opt/homebrew/Cellar/werf@3/3.12.1/share/zsh/site-functions/_werf
+/opt/homebrew/Cellar/werf@3/3.12.1/share/fish/vendor_completions.d/werf.fish
 ```
 
 Installed formulae with their versions:
@@ -112,7 +112,7 @@ $ brew list --formula --versions
 deckhouse-cli 0.33.14
 deckhouse-module-tool 0.2.2
 flant-flint 2.1.3
-werf 2.75.3
+werf@3 3.12.1
 ```
 
 `brew list --formula --full-name` (without `--versions`) qualifies the names
@@ -167,10 +167,7 @@ them.
 
 ## Other Ways to Specify a Formula
 
-Besides a plain name (`werf`) and a fully-qualified one
-(`mihalych-pro/tap/werf`), `brew` also accepts:
-
-- a path to a formula file, _e.g._ `Formula/w/werf.rb`;
-- a URL to a formula file;
-- a formula file in the working directory — prefix it with `./` to be sure it
-  wins over a tapped formula of the same name.
+`brew` accepts a plain name (`werf`) or a fully-qualified one
+(`mihalych-pro/tap/werf`). Since Homebrew 7.0.13 it no longer takes a path or a
+URL to a formula file: `brew info ./Formula/w/werf@3.rb` fails with
+"Invalid tap name". To try an edited formula, put it in a tap and use its name.
