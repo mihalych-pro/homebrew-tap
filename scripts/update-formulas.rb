@@ -102,8 +102,12 @@ module TapUpdater
     untrusted = []
 
     packages = Homebrew::API.with_no_api_env do
-      loaders = tap.formula_files.to_h { |path| [path, -> { Formulary.factory(path) }] }
-                   .merge(tap.cask_files.to_h { |path| [path, -> { Cask::CaskLoader.load(path) }] })
+      # By full name, the way `brew` itself resolves a package: since 7.0.13
+      # Formulary.factory and CaskLoader.load refuse a file path, and the
+      # from_path loaders that still take one are internal to Homebrew.
+      ref = ->(path) { "#{TAP_NAME}/#{path.basename(".rb")}" }
+      loaders = tap.formula_files.to_h { |path| [path, -> { Formulary.factory(ref.call(path)) }] }
+                   .merge(tap.cask_files.to_h { |path| [path, -> { Cask::CaskLoader.load(ref.call(path)) }] })
       loaders.filter_map do |path, load|
         load.call
       rescue Homebrew::UntrustedTapError
@@ -157,10 +161,11 @@ module TapUpdater
   #
   # Caution: this was observed writing one platform's checksum for a cask that
   # held a `url`/`sha256` pair inside each `on_macos`/`on_linux` block, and then
-  # leaving the wrong value in place on later runs. `hytale` no longer has that
-  # shape: it builds one url from the `arch`/`os` helpers and lists a top-level
-  # `sha256` per platform, which is what homebrew-cask's own per-platform casks
-  # do and what this command is written against. Its `replace_version_and_checksum`
+  # leaving the wrong value in place on later runs. No cask here has that shape:
+  # each lists a top-level `sha256` per platform, which is what homebrew-cask's
+  # own per-platform casks do and what this command is written against. The
+  # url may still sit in each block (`hytale-launcher`, `kurlo`); both bump
+  # correctly that way. Its `replace_version_and_checksum`
   # walks os x arch, skips the architectures a cask's `depends_on arch:` excludes,
   # and otherwise raises telling you to declare them -- so a cask here must keep
   # stating unsupported platforms that way.
