@@ -13,8 +13,8 @@ class DeckhouseCli < Formula
   # Pointing it at the source of the same tag is core's own shape (see
   # `graalvm`) and keeps the formula from claiming an arm64 binary that does not
   # exist. Nothing is ever fetched from it: the requirement fails first.
-  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.34.7.tar.gz"
-  sha256 "19083ed90d482d648a3470bdd5908feeeec123ded3b580c9f34abc68812829b8"
+  url "https://github.com/deckhouse/deckhouse-cli/archive/refs/tags/v0.34.8.tar.gz"
+  sha256 "cd0c921995acf91947768ae4ba495a61f1fec3c47c6fa6f3ef5898a757e6d1d4"
   license "Apache-2.0"
 
   livecheck do
@@ -27,12 +27,12 @@ class DeckhouseCli < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.7/d8-v0.34.7-darwin-amd64.tar.gz"
-      sha256 "2612d6c114b5486f435b01a9b74f9f9747dc28cd80337dcd12f095f3681fe554"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.8/d8-v0.34.8-darwin-amd64.tar.gz"
+      sha256 "6efe3ffb8d96ddb0c41bda9bbb997d51fbf011aa5b1007bb0b067655cf4c2f1e"
     end
     on_arm do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.7/d8-v0.34.7-darwin-arm64.tar.gz"
-      sha256 "7068dcbe85800d0291c2f66022ea1921c802d76eae1dc3402689d061020cfd95"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.8/d8-v0.34.8-darwin-arm64.tar.gz"
+      sha256 "ced7cfa710a9db6aa40284eafeba5046a7805b6b2b860fe78207a96931feb3e1"
     end
   end
 
@@ -40,8 +40,8 @@ class DeckhouseCli < Formula
     depends_on arch: :x86_64
 
     on_intel do
-      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.7/d8-v0.34.7-linux-amd64.tar.gz"
-      sha256 "a3c53f13fd7ca03f24b6f0205671db75e2273ab2dad04b87778a13deda431517"
+      url "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.34.8/d8-v0.34.8-linux-amd64.tar.gz"
+      sha256 "11ce10b1f9946673f8d5b86f8b42d5925fb97b5bae4c1de14fa890bc64474603"
     end
   end
 
