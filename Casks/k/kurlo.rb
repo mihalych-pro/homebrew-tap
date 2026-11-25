@@ -4,7 +4,7 @@ cask "kurlo" do
   # not served (see below). macOS is one universal build with no arch in its name.
   arch arm: "arm64", intel: "amd64"
 
-  version "3.1.5"
+  version "3.2.0"
   # Both checksums are those of SHA256SUMS.txt in the release. macOS ships a
   # single universal build, so arm and Intel share one. Linux is published for
   # amd64 alone: the arm64 AppImage the Linux url renders is not served and has
@@ -12,9 +12,9 @@ cask "kurlo" do
   # It still has to render something, because `brew tap` loads every cask under
   # every OS/arch pair and one resolving to no url fails the whole tap with
   # "Missing URL".
-  sha256 arm:          "67a8ec0e3d379e28a3879cee9d5c9f46939ab99ac70dc5656eef70afe94aaabe",
-         intel:        "67a8ec0e3d379e28a3879cee9d5c9f46939ab99ac70dc5656eef70afe94aaabe",
-         x86_64_linux: "07fcf9c7b6344d1145b3d2e0a68cb8c707278520b0b580b051ac90a81832efdd"
+  sha256 arm:          "87befa5dfb19b29e97eda54a8572b4a41a50d2cc60fab37fa3f9f9e7969b81c6",
+         intel:        "87befa5dfb19b29e97eda54a8572b4a41a50d2cc60fab37fa3f9f9e7969b81c6",
+         x86_64_linux: "c27b77949c1fa1fc16f95b139c2f770e32371c1ebf89754b1c8607db06aa0ced"
 
   on_macos do
     # The bundle zipped for the in-app updater (`darwin-universal-app` in
