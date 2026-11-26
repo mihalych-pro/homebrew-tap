@@ -4,5 +4,5 @@
 
 | Cask | Description | Platforms | Version | Updated |
 | --- | --- | --- | --- | --- |
-| [hytale-launcher](Casks/h/hytale-launcher.rb) | Official Hytale Launcher | macOS (arm64), Linux (x86_64) | 2026.11.16-1726018 | 2026-11-20 |
+| [hytale-launcher](Casks/h/hytale-launcher.rb) | Official Hytale Launcher | macOS (arm64), Linux (x86_64) | 2026.11.23-8717529 | 2026-11-26 |
 | [kurlo](Casks/k/kurlo.rb) | Open-source API client with an agent inside | macOS (arm64, x86_64), Linux (x86_64) | 3.2.0 | 2026-11-25 |

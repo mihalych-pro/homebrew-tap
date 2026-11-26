@@ -2,7 +2,7 @@ cask "hytale-launcher" do
   # Upstream lays its downloads out as `<os>/<arch>/hytale-launcher-<version>.<ext>`.
   arch arm: "arm64", intel: "amd64"
 
-  version "2026.11.16-1726018"
+  version "2026.11.23-8717529"
   # Only the two builds that exist: macOS is published for arm64 alone and Linux
   # for amd64 alone. The Linux checksum is the one
   # https://launcher.hytale.com/version/release/launcher.json names -- the same
@@ -14,8 +14,8 @@ cask "hytale-launcher" do
   # macOS Intel still has to render one, because `brew tap` loads every cask
   # under every macOS version and arch, and one resolving to no url fails the
   # whole tap with "Missing URL".
-  sha256 arm:          "d8d3d4ca7b15f392beaffc5b3d622da850b59d16b0361fed0b646678a1ce5b8a",
-         x86_64_linux: "24341e50a9e3ee37ffcf68943bb924dc8d0af18071fa3fde55d2755a9add54fe"
+  sha256 arm:          "1470347eaa3884334aba9de73e220b64b0bb7270f9bcbf0c90b6da7ee7ea5c07",
+         x86_64_linux: "3b7cef6e3c77d62612bac34f125b288ac867ce8524c63786be58d11eb14db4cf"
 
   on_macos do
     # The `.dmg`, as homebrew-cask's own `hytale` uses, not the `.zip` the
